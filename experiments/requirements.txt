@@ -1,0 +1,9 @@
+transformers==4.17.0
+sacrebleu[ja]==2.0.0
+sentence-transformers==2.1.0
+bert_score==0.3.11
+datasets==1.18.0
+requests
+jupyter
+numpy
+sklearn
