@@ -1,5 +1,5 @@
 # NMTScore
-![Master](https://github.com/jvamvas/nmtscore/workflows/unittest/badge.svg?branch=master&event=push)
+![Master](https://github.com/ZurichNLP/nmtscore/workflows/unittest/badge.svg?branch=master&event=push)
 [![PyPI](https://img.shields.io/pypi/v/nmtscore)](https://pypi.python.org/pypi/nmtscore/)
 
 A library of translation-based text similarity measures.
