@@ -1,3 +1,5 @@
+import os
+import unittest
 from unittest import TestCase
 
 from nmtscore.models import load_translation_model
@@ -112,6 +114,7 @@ class SmallM2M100TestCase(NMTModelTestCase):
         cls.model = load_translation_model("m2m100_418M")
 
 
+@unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
 class LargeM2M100TestCase(NMTModelTestCase):
 
     @classmethod
@@ -119,6 +122,7 @@ class LargeM2M100TestCase(NMTModelTestCase):
         cls.model = load_translation_model("m2m100_1.2B")
 
 
+@unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
 class PrismTestCase(NMTModelTestCase):
 
     @classmethod
