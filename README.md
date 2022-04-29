@@ -4,7 +4,7 @@
 
 A library of translation-based text similarity measures.
 
-The measures are further described in the paper "NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures".
+The measures are further described in the paper ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692).
 
 <img src="img/figure1.png" alt="Three text similarity measures implemented in this library" width="500">
 
@@ -131,7 +131,14 @@ model.score("de", ["This is a test."], ["Das ist ein Test."])
 See [experiments/README.md](experiments/README.md)
 
 ## Citation
-TBA
+```bibtex
+@article{vamvas2022nmtscore,
+  title={{NMTScore}: A Multilingual Analysis of Translation-based Text Similarity Measures},
+  author={Vamvas, Jannis and Sennrich, Rico},
+  journal={arXiv preprint arXiv:2204.13692},
+  year={2022}
+}
+```
 
 ## License
 - Code: MIT License
