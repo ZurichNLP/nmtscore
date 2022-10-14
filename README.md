@@ -78,7 +78,7 @@ This library currently supports three NMT models:
 - [m2m100_418M](https://huggingface.co/facebook/m2m100_418M) and [m2m100_1.2B](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://www.jmlr.org/papers/volume22/20-1307/)
 - [Prism](https://github.com/thompsonb/prism) by [Thompson and Post (2020)](https://aclanthology.org/2020.emnlp-main.8/)
 
-By default, the leanest model (m2m100_418M) is loaded. The main results in the paper are based on the Prism model.
+By default, the leanest model (m2m100_418M) is loaded. The main results in the paper are based on the Prism model, which has some extra requirements (see "Installation"), but is recommended due to its higher accuracy.
 
 ```python
 scorer = NMTScorer("m2m100_418M", device=None)  # default
@@ -118,7 +118,7 @@ The NMT models also provide a direct interface for translating and scoring.
 ```python
 from nmtscore.models import load_translation_model
 
-model = load_translation_model("m2m100_418M")
+model = load_translation_model("prism")
 
 model.translate("de", ["This is a test."])
 # ["Das ist ein Test."]

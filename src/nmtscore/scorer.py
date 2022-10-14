@@ -1,4 +1,5 @@
 import logging
+import warnings
 from typing import Union, List, Optional
 
 import numpy as np
@@ -68,20 +69,26 @@ class NMTScorer:
         """
         if both_directions:
             assert b_lang is not None
+        if self.model.requires_src_lang and b_lang is None:
+            warnings.warn(f"NMT model {self.model} requires the src language. Assuming {a_lang}; override with `b_lang`")
+            b_lang = a_lang
+
         scores = self.model.score(
+            src_lang=b_lang,
             tgt_lang=a_lang,
             source_sentences=b,
             hypothesis_sentences=a,
             **(score_kwargs or {}),
         )
         if normalize:
-            self_scores = self.score_direct(a, a, a_lang, b_lang=None, normalize=False, both_directions=False, score_kwargs=score_kwargs)
+            self_scores = self.score_direct(a, a, a_lang, b_lang=a_lang, normalize=False, both_directions=False, score_kwargs=score_kwargs)
             scores = np.array(scores) / np.array(self_scores)
         if both_directions:
             reverse_scores = self.score_direct(b, a, b_lang, a_lang, normalize=normalize, both_directions=False, score_kwargs=score_kwargs)
             scores = self._average_scores(scores, reverse_scores)
         if print_signature:
-            print(self._build_version_string("direct", normalized=normalize, both_directions=both_directions))
+            print(self._build_version_string("direct", a_lang=a_lang, b_lang=b_lang,
+                                             normalized=normalize, both_directions=both_directions))
         return scores
 
     def score_pivot(self,
@@ -112,9 +119,14 @@ class NMTScorer:
         """
         if both_directions:
             assert b_lang is not None
+        if self.model.requires_src_lang and b_lang is None:
+            warnings.warn(f"NMT model {self.model} requires the src language. Assuming {a_lang}; override with `b_lang`")
+            b_lang = a_lang
+
         if isinstance(a, list) and len(a) >= 10:
             logging.info(f"Translating to pivot language {pivot_lang} ...")
         translations = self.model.translate(
+            src_lang=b_lang,
             tgt_lang=pivot_lang,
             source_sentences=b,
             **(translate_kwargs or {}),
@@ -122,13 +134,14 @@ class NMTScorer:
         if isinstance(a, list) and len(a) >= 10:
             logging.info(f"Scoring sentences ...")
         scores = self.model.score(
+            src_lang=pivot_lang,
             tgt_lang=a_lang,
             source_sentences=translations,
             hypothesis_sentences=a,
             **(score_kwargs or {}),
         )
         if normalize:
-            self_scores = self.score_pivot(a, a, a_lang, b_lang=None, pivot_lang=pivot_lang, normalize=False, both_directions=False,
+            self_scores = self.score_pivot(a, a, a_lang, b_lang=a_lang, pivot_lang=pivot_lang, normalize=False, both_directions=False,
                                               translate_kwargs=translate_kwargs, score_kwargs=score_kwargs)
             scores = np.array(scores) / np.array(self_scores)
         if both_directions:
@@ -136,12 +149,15 @@ class NMTScorer:
                                               translate_kwargs=translate_kwargs, score_kwargs=score_kwargs)
             scores = self._average_scores(scores, reverse_scores)
         if print_signature:
-            print(self._build_version_string("pivot", normalized=normalize, both_directions=both_directions, pivot_lang=pivot_lang))
+            print(self._build_version_string("pivot", normalized=normalize, both_directions=both_directions,
+                                             pivot_lang=pivot_lang, a_lang=a_lang, b_lang=b_lang))
         return scores
 
     def score_cross_likelihood(self,
                                a: Union[str, List[str]],
                                b: Union[str, List[str]],
+                               a_lang: Optional[str] = None,
+                               b_lang: Optional[str] = None,
                                tgt_lang: str = "en",
                                normalize: bool = True,
                                both_directions: bool = True,
@@ -156,6 +172,8 @@ class NMTScorer:
         :param b: A sentence or list of sentences. If :param: both_directions is False this is the sentence that is
          translated
         :param tgt_lang: The language code of the target language (default: "en")
+        :param a_lang: The language code of A (default: None). Not needed for some multilingual models
+        :param b_lang: The language code of B (default: a_lang). Not needed for some multilingual models
         :param normalize: Apply a normalization to the similarity score (default: True)
         :param both_directions: Return the average of score(a, b) and score(b, a) (default: True)
         :param print_signature: Print a version signature for the metric (default: False)
@@ -163,9 +181,15 @@ class NMTScorer:
         :param score_kwargs
         :return: A float or list of floats
         """
+        if self.model.requires_src_lang and (a_lang is None or b_lang is None):
+            warnings.warn(f"NMT model {self.model} requires the input languages. Assuming 'en' for unspecified languages; "
+                          f"override with `a_lang` and `b_lang`")
+            a_lang = a_lang or "en"
+            b_lang = b_lang or a_lang
         if isinstance(a, list) and len(a) >= 10:
             logging.info(f"Translating to target language {tgt_lang} ...")
         translations_scores = self.model.translate(
+            src_lang=b_lang,
             tgt_lang=tgt_lang,
             source_sentences=b,
             return_score=True,
@@ -175,6 +199,7 @@ class NMTScorer:
         if isinstance(a, list) and len(a) >= 10:
             logging.info(f"Scoring sentences ...")
         scores = self.model.score(
+            src_lang=a_lang,
             tgt_lang=tgt_lang,
             source_sentences=a,
             hypothesis_sentences=translations,
@@ -187,6 +212,7 @@ class NMTScorer:
             no_scores_yet = translation_scores[0] is None if isinstance(translation_scores, list) else translation_scores is None
             if no_scores_yet:
                 translation_scores = self.model.score(
+                    src_lang=b_lang,
                     tgt_lang=tgt_lang,
                     source_sentences=b,
                     hypothesis_sentences=translations,
@@ -194,11 +220,13 @@ class NMTScorer:
                 )
             scores = np.array(scores) / np.array(translation_scores)
         if both_directions:
-            reverse_scores = self.score_cross_likelihood(b, a, tgt_lang, normalize=normalize, both_directions=False,
+            reverse_scores = self.score_cross_likelihood(b, a, tgt_lang, a_lang=b_lang, b_lang=a_lang,
+                                                    normalize=normalize, both_directions=False,
                                                     translate_kwargs=translate_kwargs, score_kwargs=score_kwargs)
             scores = self._average_scores(scores, reverse_scores)
         if print_signature:
-            print(self._build_version_string("cross", normalized=normalize, both_directions=both_directions, tgt_lang=tgt_lang))
+            print(self._build_version_string("cross", normalized=normalize, both_directions=both_directions,
+                                             tgt_lang=tgt_lang, a_lang=a_lang, b_lang=b_lang))
         return scores
 
     def _average_scores(self,
@@ -214,12 +242,16 @@ class NMTScorer:
                               both_directions: bool,
                               tgt_lang: str = None,
                               pivot_lang: str = None,
+                              a_lang: str = None,
+                              b_lang: str = None,
                               ) -> str:
         import nmtscore
         import transformers
         return f"NMTScore-{type}|" \
                f"{f'tgt-lang:{tgt_lang}|' if tgt_lang is not None else ''}" \
                f"{f'pivot-lang:{pivot_lang}|' if pivot_lang is not None else ''}" \
+               f"{f'a-lang:{a_lang}|' if a_lang is not None else ''}" \
+               f"{f'b-lang:{b_lang}|' if b_lang is not None else ''}" \
                f"model:{self.model}|" \
                f"{'normalized' if normalized else 'unnormalized'}|" \
                f"{'both-directions' if both_directions else 'single-direction'}|" \

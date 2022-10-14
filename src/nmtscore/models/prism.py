@@ -49,6 +49,10 @@ class PrismModel(TranslationModel):
     def __str__(self):
         return "prism"
 
+    @property
+    def requires_src_lang(self) -> bool:
+        return False
+
     def _set_tgt_lang(self, tgt_lang: str):
         assert tgt_lang in self.supported_languages
         self.tgt_lang = tgt_lang
