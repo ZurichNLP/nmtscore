@@ -81,7 +81,7 @@ class NMTScorer:
             **(score_kwargs or {}),
         )
         if normalize:
-            self_scores = self.score_direct(a, a, a_lang, b_lang=a_lang, normalize=False, both_directions=False, score_kwargs=score_kwargs)
+            self_scores = self.score_direct(a, a, a_lang, a_lang, normalize=False, both_directions=False, score_kwargs=score_kwargs)
             scores = np.array(scores) / np.array(self_scores)
         if both_directions:
             reverse_scores = self.score_direct(b, a, b_lang, a_lang, normalize=normalize, both_directions=False, score_kwargs=score_kwargs)
@@ -141,7 +141,7 @@ class NMTScorer:
             **(score_kwargs or {}),
         )
         if normalize:
-            self_scores = self.score_pivot(a, a, a_lang, b_lang=a_lang, pivot_lang=pivot_lang, normalize=False, both_directions=False,
+            self_scores = self.score_pivot(a, a, a_lang, a_lang, pivot_lang=pivot_lang, normalize=False, both_directions=False,
                                               translate_kwargs=translate_kwargs, score_kwargs=score_kwargs)
             scores = np.array(scores) / np.array(self_scores)
         if both_directions:
@@ -220,7 +220,7 @@ class NMTScorer:
                 )
             scores = np.array(scores) / np.array(translation_scores)
         if both_directions:
-            reverse_scores = self.score_cross_likelihood(b, a, tgt_lang, a_lang=b_lang, b_lang=a_lang,
+            reverse_scores = self.score_cross_likelihood(b, a, b_lang, a_lang, tgt_lang=tgt_lang,
                                                     normalize=normalize, both_directions=False,
                                                     translate_kwargs=translate_kwargs, score_kwargs=score_kwargs)
             scores = self._average_scores(scores, reverse_scores)
