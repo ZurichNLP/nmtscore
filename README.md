@@ -4,7 +4,7 @@
 
 A library of translation-based text similarity measures.
 
-To learn more about how these measures work, have a look at [Jannis' blog post](https://vamvas.ch/nmtscore-text-similarity-via-translation). Also, read our paper, ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692).
+To learn more about how these measures work, have a look at [Jannis' blog post](https://vamvas.ch/nmtscore-text-similarity-via-translation). Also, read our paper, ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692) (Findings of EMNLP).
 
 <img src="img/figure1.png" alt="Three text similarity measures implemented in this library" width="500">
 
@@ -132,11 +132,16 @@ See [experiments/README.md](experiments/README.md)
 
 ## Citation
 ```bibtex
-@article{vamvas2022nmtscore,
-  title={{NMTScore}: A Multilingual Analysis of Translation-based Text Similarity Measures},
-  author={Vamvas, Jannis and Sennrich, Rico},
-  journal={arXiv preprint arXiv:2204.13692},
-  year={2022}
+@inproceedings{vamvas-sennrich-2022-nmtscore,
+       author = "Vamvas, Jannis and
+                 Sennrich, Rico",
+        title = "{NMTScore}: A Multilingual Analysis of Translation-based Text Similarity Measures",
+    booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2022",
+         year = "2022",
+        month = dec,
+      address = "Abu Dhabi, United Arab Emirates",
+    publisher = "Association for Computational Linguistics",
+       eprint = {2204.13692}
 }
 ```
 
