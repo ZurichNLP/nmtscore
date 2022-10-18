@@ -12,13 +12,13 @@ class NMTModelTestCase(TestCase):
         raise NotImplementedError
 
     def test_translate(self):
-        self.assertIn(self.model.translate("de", "This is a test."), {
+        self.assertIn(self.model.translate("de", "This is a test.", src_lang="en"), {
             "Dies ist ein Test.",
             "Das ist ein Test.",
         })
 
     def test_translate_score(self):
-        translation, score = self.model.translate("de", "This is a test.", return_score=True)
+        translation, score = self.model.translate("de", "This is a test.", return_score=True, src_lang="en")
         self.assertIn(translation, {
             "Dies ist ein Test.",
             "Das ist ein Test.",
@@ -27,10 +27,10 @@ class NMTModelTestCase(TestCase):
             return
         self.assertGreaterEqual(score, 0)
         self.assertLessEqual(score, 1)
-        self.assertAlmostEqual(score, self.model.score("de", "This is a test.", translation), places=5)
+        self.assertAlmostEqual(score, self.model.score("de", "This is a test.", translation, src_lang="en"), places=5)
 
     def test_translate_batched(self):
-        translations = self.model.translate("de", 8 * ["This is a test."])
+        translations = self.model.translate("de", 8 * ["This is a test."], src_lang="en")
         self.assertEqual(8, len(translations))
         self.assertEqual(1, len(set(translations)))
         self.assertIn(translations[0], {
@@ -41,6 +41,7 @@ class NMTModelTestCase(TestCase):
     def test_score(self):
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(2 * ["This is a test."]),
             hypothesis_sentences=(["Dies ist ein Test.", "Diese Übersetzung ist komplett falsch."]),
         )
@@ -48,12 +49,14 @@ class NMTModelTestCase(TestCase):
         self.assertIsInstance(scores[1], float)
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(2 * ["This is a test."]),
             hypothesis_sentences=(["Diese Übersetzung ist komplett falsch.", "Dies ist ein Test."]),
         )
         self.assertLess(scores[0], scores[1])
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(2 * ["This is a test."]),
             hypothesis_sentences=(2 * ["Dies ist ein Test."]),
         )
@@ -62,6 +65,7 @@ class NMTModelTestCase(TestCase):
     def test_score_batched(self):
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(4 * ["This is a test."]),
             hypothesis_sentences=(["Diese Übersetzung ist komplett falsch", "Dies ist ein Test.", "Dies ist ein Test.", "Dies ist ein Test."]),
             batch_size=2,
@@ -72,6 +76,7 @@ class NMTModelTestCase(TestCase):
 
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(["This is a test.", "A translation that is completely wrong.", "This is a test.", "This is a test."]),
             hypothesis_sentences=(4 * ["Dies ist ein Test."]),
             batch_size=2,
@@ -82,6 +87,7 @@ class NMTModelTestCase(TestCase):
 
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(4 * ["This is a test."]),
             hypothesis_sentences=(["Dies ist ein Test.", "Dies ist ein Test.", ".", "Dies ist ein Test."]),
             batch_size=2,
@@ -92,6 +98,7 @@ class NMTModelTestCase(TestCase):
 
         scores = self.model.score(
             "de",
+            src_lang = "en",
             source_sentences=(["This is a test.", "This is a test.", "This is a test.", "A translation that is completely wrong."]),
             hypothesis_sentences=(4 * ["Dies ist ein Test."]),
             batch_size=2,
@@ -101,10 +108,10 @@ class NMTModelTestCase(TestCase):
         self.assertLess(scores[3], scores[0])
 
     def test_translate_long_input(self):
-        self.model.translate("de", 100 * "This is a test. ")
+        self.model.translate("de", 100 * "This is a test. ", src_lang="en")
 
     def test_score_long_input(self):
-        self.model.score("de", 100 * "This is a test. ", 100 * "Dies ist ein Test. ")
+        self.model.score("de", 100 * "This is a test. ", 100 * "Dies ist ein Test. ", src_lang="en")
 
 
 class SmallM2M100TestCase(NMTModelTestCase):

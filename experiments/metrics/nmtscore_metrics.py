@@ -12,11 +12,15 @@ from nmtscore import NMTScorer
 class NMTScoreMetric(ReferenceBasedMetric):
 
     def __init__(self,
+                 summaries_lang: Optional[str] = None,
+                 references_lang: Optional[str] = None,
                  scorer: Union[NMTScorer, str] = "m2m100_418M",
                  normalize: bool = True,
                  both_directions: bool = True,
                  ):
         super().__init__()
+        self.summaries_lang = summaries_lang
+        self.references_lang = references_lang
         if isinstance(scorer, str):
             self.scorer = NMTScorer(scorer)
         else:
@@ -108,9 +112,7 @@ class DirectNMTScoreMetric(NMTScoreMetric):
                  ):
         if both_directions:
             assert references_lang is not None
-        super().__init__(scorer, normalize, both_directions)
-        self.summaries_lang = summaries_lang
-        self.references_lang = references_lang
+        super().__init__(summaries_lang, references_lang, scorer, normalize, both_directions)
         self.score_kwargs = score_kwargs
 
     @property
@@ -156,9 +158,7 @@ class PivotNMTScoreMetric(NMTScoreMetric):
                  ):
         if both_directions:
             assert references_lang is not None
-        super().__init__(scorer, normalize, both_directions)
-        self.summaries_lang = summaries_lang
-        self.references_lang = references_lang
+        super().__init__(summaries_lang, references_lang, scorer, normalize, both_directions)
         self.pivot_lang = pivot_lang
         self.translate_kwargs = translate_kwargs
         self.score_kwargs = score_kwargs
@@ -200,6 +200,8 @@ class CrossLikelihoodNMTScoreMetric(NMTScoreMetric):
     name = "nmtscore-cross"
 
     def __init__(self,
+                 summaries_lang: Optional[str] = None,
+                 references_lang: Optional[str] = None,
                  tgt_lang: str = "en",
                  scorer: Union[NMTScorer, str] = "m2m100_418M",
                  normalize: bool = True,
@@ -207,7 +209,7 @@ class CrossLikelihoodNMTScoreMetric(NMTScoreMetric):
                  translate_kwargs: dict = None,
                  score_kwargs: dict = None,
                  ):
-        super().__init__(scorer, normalize, both_directions)
+        super().__init__(summaries_lang, references_lang, scorer, normalize, both_directions)
         self.tgt_lang = tgt_lang
         self.translate_kwargs = translate_kwargs
         self.score_kwargs = score_kwargs
@@ -221,6 +223,8 @@ class CrossLikelihoodNMTScoreMetric(NMTScoreMetric):
         return self.scorer.score_cross_likelihood(
             summaries,
             references,
+            self.summaries_lang,
+            self.references_lang,
             tgt_lang=self.tgt_lang,
             normalize=self.normalize,
             both_directions=False,
@@ -232,6 +236,8 @@ class CrossLikelihoodNMTScoreMetric(NMTScoreMetric):
         return self.scorer.score_cross_likelihood(
             references,
             summaries,
+            self.references_lang,
+            self.summaries_lang,
             tgt_lang=self.tgt_lang,
             normalize=self.normalize,
             both_directions=False,
