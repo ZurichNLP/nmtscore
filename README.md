@@ -4,7 +4,7 @@
 
 A library of translation-based text similarity measures.
 
-The measures are further described in the paper ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692).
+To learn more about how these measures work, have a look at [Jannis' blog post](https://vamvas.ch/nmtscore-text-similarity-via-translation). Also, read our paper, ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692).
 
 <img src="img/figure1.png" alt="Three text similarity measures implemented in this library" width="500">
 
