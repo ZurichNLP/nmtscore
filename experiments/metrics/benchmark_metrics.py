@@ -101,6 +101,8 @@ def get_paraphrase_metrics(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood",
             metric_names=["nmtscore-cross"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("prism", device=device),
                 both_directions=True,
                 translate_kwargs=NMT_TRANSLATE_KWARGS,
@@ -166,6 +168,8 @@ def get_nlg_evaluation_metrics(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood",
             metric_names=["nmtscore-cross", "nmtscore-cross-hyp|ref", "nmtscore-cross-ref|hyp"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("prism", device=device),
                 both_directions=True,
                 translate_kwargs=NMT_TRANSLATE_KWARGS,
@@ -208,6 +212,8 @@ def get_paraphrase_metrics_m2m100(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood (m2m100_418M)",
             metric_names=["nmtscore-cross"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("m2m100_418M", device=device),
                 both_directions=True,
                 translate_kwargs={**NMT_TRANSLATE_KWARGS, **{"batch_size": batch_size}},
@@ -242,6 +248,8 @@ def get_paraphrase_metrics_m2m100(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood (m2m100_1.2B)",
             metric_names=["nmtscore-cross"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("m2m100_1.2B", device=device),
                 both_directions=True,
                 translate_kwargs={**NMT_TRANSLATE_KWARGS, **{"batch_size": batch_size}},
@@ -285,6 +293,8 @@ def get_normalization_ablation_metrics(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood (normalized)",
             metric_names=["nmtscore-cross"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("prism", device=device),
                 normalize=True,
                 both_directions=True,
@@ -322,6 +332,8 @@ def get_normalization_ablation_metrics(device=None) -> List[BenchmarkMetric]:
             title="Translation_Cross-Likelihood (unnormalized)",
             metric_names=["nmtscore-cross"],
             load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
                 scorer=NMTScorer("prism", device=device),
                 normalize=False,
                 both_directions=True,

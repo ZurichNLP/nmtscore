@@ -78,11 +78,11 @@ class ReadmeTestCase(TestCase):
         a = "This is a sentence."
         b = "This is another sentence."
         score = scorer.score(a, b, print_signature=True)
-        self.assertIn("NMTScore-cross|tgt-lang:en|model:facebook/m2m100_418M|normalized|both-directions", mock_stdout.getvalue())
+        self.assertIn("NMTScore-cross|tgt-lang:en|a-lang:en|b-lang:en|model:facebook/m2m100_418M|normalized|both-directions", mock_stdout.getvalue())
 
     def test_nmt_models(self):
         model = load_translation_model("m2m100_418M")
-        translations = model.translate("de", ["This is a test."])
+        translations = model.translate("de", ["This is a test."], src_lang="en")
         self.assertEqual(["Das ist ein Test."], translations)
-        scores = model.score("de", ["This is a test."], ["Das ist ein Test."])
+        scores = model.score("de", ["This is a test."], ["Das ist ein Test."], src_lang="en")
         self.assertAlmostEqual(0.5148844122886658, scores[0], places=4)

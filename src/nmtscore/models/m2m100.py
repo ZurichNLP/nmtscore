@@ -34,6 +34,14 @@ class M2M100Model(TranslationModel):
     def __str__(self):
         return self.model_name_or_path
 
+    @property
+    def requires_src_lang(self) -> bool:
+        return True
+
+    def _set_src_lang(self, src_lang: str):
+        self.src_lang = src_lang
+        self.tokenizer.src_lang = src_lang
+
     def _set_tgt_lang(self, tgt_lang: str):
         self.tgt_lang = tgt_lang
         self.tokenizer.tgt_lang = tgt_lang

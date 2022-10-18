@@ -1,5 +1,7 @@
 import json
 import os
+import warnings
+
 from sqlitedict import SqliteDict
 from pathlib import Path
 from typing import List, Union, Tuple
@@ -13,6 +15,7 @@ class TranslationModel:
     def translate(self,
                   tgt_lang: str,
                   source_sentences: Union[str, List[str]],
+                  src_lang: str = None,
                   return_score: bool = False,
                   batch_size: int = 8,
                   use_cache: bool = False,
@@ -21,6 +24,7 @@ class TranslationModel:
         """
         :param tgt_lang: Language code of the target language
         :param source_sentences: A sentence or list of sentences
+        :param src_lang: Language code of the source language (not needed for some multilingual models)
         :param return score: If true, return a tuple where the second element is sequence-level score of the translation
         :param batch_size
         :param use_cache
@@ -40,7 +44,8 @@ class TranslationModel:
             cached_translations_list = []
             with self.load_cache() as cache:
                 for source_sentence in source_sentences_list:
-                    translation = cache.get(f"{tgt_lang}_translate{'_score' if return_score else ''}_{source_sentence}", None)
+                    translation = cache.get(f"{(src_lang + '_') if src_lang is not None else ''}{tgt_lang}_"
+                                            f"translate{'_score' if return_score else ''}_{source_sentence}", None)
                     cached_translations_list.append(translation)
             full_source_sentences_list = source_sentences_list
             source_sentences_list = [
@@ -50,6 +55,11 @@ class TranslationModel:
             ]
 
         self._set_tgt_lang(tgt_lang)
+        if self.requires_src_lang:
+            if src_lang is None:
+                warnings.warn(f"NMT model {self} requires the src language. Assuming 'en'; override with `src_lang`")
+                src_lang = "en"
+            self._set_src_lang(src_lang)
         translations_list = self._translate(source_sentences_list, return_score, batch_size, **kwargs)
         assert len(translations_list) == len(source_sentences_list)
 
@@ -59,7 +69,9 @@ class TranslationModel:
                 if cached_translation is not None:
                     translations_list.insert(i, cached_translation)
                 else:
-                    cache_update[f"{tgt_lang}_translate{'_score' if return_score else ''}_{full_source_sentences_list[i]}"] = translations_list[i]
+                    cache_update[f"{(src_lang + '_') if src_lang is not None else ''}{tgt_lang}_" \
+                                 f"translate{'_score' if return_score else ''}_" \
+                                 f"{full_source_sentences_list[i]}"] = translations_list[i]
             if cache_update:
                 with self.load_cache() as cache:
                     cache.update(cache_update)
@@ -75,6 +87,7 @@ class TranslationModel:
               tgt_lang: str,
               source_sentences: Union[str, List[str]],
               hypothesis_sentences: Union[str, List[str]],
+              src_lang: str = None,
               batch_size: int = 8,
               use_cache: bool = False,
               **kwargs,
@@ -83,6 +96,7 @@ class TranslationModel:
         :param tgt_lang: Language code of the target language
         :param source_sentences: A sentence or list of sentences
         :param hypothesis_sentences: A sentence or list of sentences
+        :param src_lang: Language code of the source language (not needed for some multilingual models)
         :param batch_size
         :param use_cache
         :param kwargs
@@ -105,7 +119,8 @@ class TranslationModel:
             cached_scores_list = []
             with self.load_cache() as cache:
                 for source_sentence, hypothesis_sentence in zip(source_sentences_list, hypothesis_sentences_list):
-                    score = cache.get(f"{tgt_lang}_score_{source_sentence}_{hypothesis_sentence}", None)
+                    score = cache.get(f"{(src_lang + '_') if src_lang is not None else ''}{tgt_lang}_"
+                                      f"score_{source_sentence}_{hypothesis_sentence}", None)
                     cached_scores_list.append(score)
             full_source_sentences_list = source_sentences_list
             source_sentences_list = [
@@ -121,6 +136,8 @@ class TranslationModel:
             ]
 
         self._set_tgt_lang(tgt_lang)
+        if self.requires_src_lang:
+            self._set_src_lang(src_lang)
         scores_list = self._score(source_sentences_list, hypothesis_sentences_list, batch_size, **kwargs)
         assert len(scores_list) == len(source_sentences_list)
 
@@ -130,8 +147,9 @@ class TranslationModel:
                 if cached_score is not None:
                     scores_list.insert(i, cached_score)
                 else:
-                    cache_update[f"{tgt_lang}_score_{full_source_sentences_list[i]}_{full_hypothesis_sentences_list[i]}"] = \
-                        scores_list[i]
+                    cache_update[f"{(src_lang + '_') if src_lang is not None else ''}{tgt_lang}_" \
+                                 f"score_{full_source_sentences_list[i]}_" \
+                                 f"{full_hypothesis_sentences_list[i]}"] = scores_list[i]
             if cache_update:
                 with self.load_cache() as cache:
                     cache.update(cache_update)
@@ -142,6 +160,16 @@ class TranslationModel:
         else:
             scores = scores_list
         return scores
+
+    @property
+    def requires_src_lang(self) -> bool:
+        """
+        Boolean indicating whether the model requires the source language to be specified
+        """
+        raise NotImplementedError
+
+    def _set_src_lang(self, src_lang: str):
+        raise NotImplementedError
 
     def _set_tgt_lang(self, tgt_lang: str):
         raise NotImplementedError

@@ -14,6 +14,10 @@ class CopyTranslationModel(TranslationModel):
     def __str__(self):
         return "copy-translation-model"
 
+    @property
+    def requires_src_lang(self) -> bool:
+        return False
+
     def _set_tgt_lang(self, tgt_lang: str):
         pass
 
