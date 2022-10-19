@@ -36,8 +36,8 @@
 
 ## Data-to-text
 
-### RDF-to-text (Figure 2)
+### RDF-to-text (Figure 3)
 - python [scripts/run_rdf_to_text.py](scripts/run_rdf_to_text.py) <en/ru> <system_level/global>
 
-### AMR-to-text (Figure 3)
+### AMR-to-text (Figure 4)
 - python [scripts/run_amr_to_text.py](scripts/run_amr_to_text.py)
