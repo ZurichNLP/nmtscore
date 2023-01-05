@@ -4,7 +4,6 @@ import torch
 from tqdm import tqdm
 from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
 from transformers.file_utils import PaddingStrategy
-from transformers.generation_utils import BeamSearchEncoderDecoderOutput
 from transformers.models.m2m_100.modeling_m2m_100 import shift_tokens_right
 
 from nmtscore.models import TranslationModel
@@ -60,7 +59,7 @@ class M2M100Model(TranslationModel):
             inputs = self.tokenizer._batch_encode_plus(src_sentences, return_tensors="pt",
                                                        padding_strategy=padding_strategy)
             inputs = inputs.to(self.model.device)
-            model_output: BeamSearchEncoderDecoderOutput = self.model.generate(
+            model_output = self.model.generate(
                 **inputs,
                 forced_bos_token_id=self.tokenizer.get_lang_id(self.tgt_lang),
                 num_beams=num_beams,
