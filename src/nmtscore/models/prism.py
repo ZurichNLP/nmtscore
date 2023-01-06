@@ -1,5 +1,6 @@
 import copy
 import sys
+import tarfile
 from pathlib import Path
 from typing import List, Union, Dict, Iterator, Any, Tuple
 
@@ -9,8 +10,7 @@ import torch
 from tqdm import tqdm
 from fairseq import checkpoint_utils, utils
 from fairseq.data import LanguagePairDataset
-from transformers import cached_path
-from transformers.file_utils import hf_bucket_url
+from transformers.utils import cached_file
 
 from nmtscore.models import TranslationModel
 
@@ -107,15 +107,17 @@ class PrismModel(TranslationModel):
         return results
 
     def _download_model(self) -> Path:
-        archive_file = hf_bucket_url(
+        archive_path = cached_file(
             "Devrim/prism-default",  # Prism model on the Hugging Face Hub (uploaded by a third party)
             filename="m39v1.tar",
         )
-        resolved_archive_file = cached_path(
-            archive_file,
-            extract_compressed_file=True,
-        )
-        return Path(resolved_archive_file) / "m39v1"
+        archive_path = Path(archive_path)
+        assert archive_path.exists()
+        assert tarfile.is_tarfile(archive_path)
+        extracted_dir = archive_path.with_suffix(".extracted")
+        with tarfile.open(archive_path) as tar_file:
+            tar_file.extractall(extracted_dir)
+        return Path(extracted_dir) / "m39v1"
 
     def _load_model(self):
         self.tokenizer = spm.SentencePieceProcessor()

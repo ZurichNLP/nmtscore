@@ -28,7 +28,6 @@ class M2M100Model(TranslationModel):
         self.model = M2M100ForConditionalGeneration.from_pretrained(model_name_or_path)
         if device is not None:
             self.model = self.model.to(device)
-        self.model.config.max_length = max(self.model.config.max_length, self.model.config.max_position_embeddings - 4)
 
     def __str__(self):
         return self.model_name_or_path
@@ -56,8 +55,11 @@ class M2M100Model(TranslationModel):
         padding_strategy = PaddingStrategy.LONGEST if batch_size > 1 else PaddingStrategy.DO_NOT_PAD
         translations = []
         for src_sentences in tqdm(list(batch(source_sentences, batch_size)), disable=len(source_sentences) / batch_size < 10):
-            inputs = self.tokenizer._batch_encode_plus(src_sentences, return_tensors="pt",
-                                                       padding_strategy=padding_strategy)
+            inputs = self.tokenizer(
+                src_sentences,
+                return_tensors="pt",
+                padding=padding_strategy,
+            )
             inputs = inputs.to(self.model.device)
             model_output = self.model.generate(
                 **inputs,
@@ -65,6 +67,7 @@ class M2M100Model(TranslationModel):
                 num_beams=num_beams,
                 return_dict_in_generate=True,
                 output_scores=return_score,
+                max_length=self.model.config.max_position_embeddings - 4,
                 **kwargs,
             )
             batch_translations = self.tokenizer.batch_decode(model_output.sequences, skip_special_tokens=True)
@@ -91,21 +94,23 @@ class M2M100Model(TranslationModel):
             batch(hypothesis_sentences, batch_size),
         )
         for src_sentences, tgt_sentences in batch_iterator:
-            inputs = self.tokenizer._batch_encode_plus(src_sentences, return_tensors="pt", padding_strategy=padding_strategy)
-            with self.tokenizer.as_target_tokenizer():
-                # Hack: Append a second EOS token to make sure that one EOS is still there after shift_tokens_right
-                tgt_sentences = [f"{sentence} {self.tokenizer.eos_token}" for sentence in tgt_sentences]
-                labels = self.tokenizer._batch_encode_plus(tgt_sentences, return_tensors="pt", padding_strategy=padding_strategy)
+            # Hack: Append a second EOS token to make sure that one EOS is still there after shift_tokens_right
+            tgt_sentences = [f"{sentence} {self.tokenizer.eos_token}" for sentence in tgt_sentences]
+            inputs = self.tokenizer(
+                src_sentences,
+                text_target=tgt_sentences,
+                return_tensors="pt",
+                padding=padding_strategy,
+            )
             inputs = inputs.to(self.model.device)
-            labels = labels.to(self.model.device)
-            labels["input_ids"][labels["input_ids"] == self.tokenizer.pad_token_id] = -100
-            inputs["decoder_input_ids"] = shift_tokens_right(labels["input_ids"], self.tokenizer.pad_token_id, self.model.config.decoder_start_token_id)
+            inputs["labels"][inputs["labels"] == self.tokenizer.pad_token_id] = -100
+            inputs["decoder_input_ids"] = shift_tokens_right(inputs["labels"], self.tokenizer.pad_token_id, self.model.config.decoder_start_token_id)
             output = self.model(**inputs)
             batch_scores = torch.zeros(len(src_sentences), device=self.model.device)
             for i in range(len(src_sentences)):
                 loss = torch.nn.CrossEntropyLoss()(
                     output.logits[i][1:].view(-1, self.model.config.vocab_size),
-                    labels["input_ids"][i][1:].view(-1),
+                    inputs["labels"][i][1:].view(-1),
                 )
                 batch_scores[i] = 2 ** (-loss)
             scores += batch_scores.tolist()
