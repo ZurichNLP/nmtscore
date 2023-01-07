@@ -1,8 +1,9 @@
+import logging
 from typing import List, Union, Tuple
 
 import torch
 from tqdm import tqdm
-from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer
+from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer, TranslationPipeline
 from transformers.file_utils import PaddingStrategy
 from transformers.models.m2m_100.modeling_m2m_100 import shift_tokens_right
 
@@ -22,15 +23,26 @@ class M2M100Model(TranslationModel):
     def __init__(self,
                  model_name_or_path: str = "facebook/m2m100_418M",
                  device=None,
+                 fp16: bool = True,
                  ):
-        self.tokenizer = M2M100Tokenizer.from_pretrained(model_name_or_path)
         self.model_name_or_path = model_name_or_path
-        self.model = M2M100ForConditionalGeneration.from_pretrained(model_name_or_path)
-        if device is not None:
-            self.model = self.model.to(device)
+        self.tokenizer = self._load_tokenizer()
+        self.model = self._load_model()
+        self.model.eval()
+        device = device if device is not None else "cpu"
+        if fp16 and device != "cpu":
+            logging.info(f"Using {self} with half precision")
+            self.model = self.model.half()
+        self.pipeline = TranslationPipeline(self.model, self.tokenizer, device=device)
 
     def __str__(self):
         return self.model_name_or_path
+
+    def _load_tokenizer(self):
+        return M2M100Tokenizer.from_pretrained(self.model_name_or_path)
+
+    def _load_model(self):
+        return M2M100ForConditionalGeneration.from_pretrained(self.model_name_or_path)
 
     @property
     def requires_src_lang(self) -> bool:
@@ -52,32 +64,19 @@ class M2M100Model(TranslationModel):
                    num_beams: int = 5,
                    **kwargs,
                    ) -> Union[List[str], List[Tuple[str, float]]]:
-        padding_strategy = PaddingStrategy.LONGEST if batch_size > 1 else PaddingStrategy.DO_NOT_PAD
-        translations = []
-        for src_sentences in tqdm(list(batch(source_sentences, batch_size)), disable=len(source_sentences) / batch_size < 10):
-            inputs = self.tokenizer(
-                src_sentences,
-                return_tensors="pt",
-                padding=padding_strategy,
-            )
-            inputs = inputs.to(self.model.device)
-            model_output = self.model.generate(
-                **inputs,
-                forced_bos_token_id=self.tokenizer.get_lang_id(self.tgt_lang),
-                num_beams=num_beams,
-                return_dict_in_generate=True,
-                output_scores=return_score,
-                max_length=self.model.config.max_position_embeddings - 4,
-                **kwargs,
-            )
-            batch_translations = self.tokenizer.batch_decode(model_output.sequences, skip_special_tokens=True)
-            if return_score:
-                # Does not match our score method output for some reason; need to investigate further
-                # scores = (2 ** model_output.sequences_scores).tolist()
-                scores = [None for _ in batch_translations]
-                assert len(batch_translations) == len(scores)
-                batch_translations = list(zip(batch_translations, scores))
-            translations += batch_translations
+        self.pipeline.batch_size = len(source_sentences)
+        outputs = self.pipeline(
+            source_sentences,
+            src_lang=self.src_lang,
+            tgt_lang=self.tgt_lang,
+            num_beams=num_beams,
+            **kwargs,
+        )
+        translations = [output['translation_text'] for output in outputs]
+        if return_score:
+            # Compute scores later because TranslationPipeline currently does not return those
+            scores = [None for _ in translations]
+            translations = list(zip(translations, scores))
         return translations
 
     @torch.no_grad()
