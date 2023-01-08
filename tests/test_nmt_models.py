@@ -114,6 +114,7 @@ class NMTModelTestCase(TestCase):
         self.model.score("de", 100 * "This is a test. ", 100 * "Dies ist ein Test. ", src_lang="en")
 
 
+@unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
 class SmallM2M100TestCase(NMTModelTestCase):
 
     @classmethod
@@ -127,6 +128,13 @@ class LargeM2M100TestCase(NMTModelTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.model = load_translation_model("m2m100_1.2B")
+
+
+class SMALL100TestCase(NMTModelTestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.model = load_translation_model("small100")
 
 
 @unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")

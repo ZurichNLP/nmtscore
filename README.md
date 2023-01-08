@@ -74,21 +74,29 @@ scorer.score_cross_likelihood(
 ```
 
 #### Different NMT models
-This library currently supports three NMT models:
-- [m2m100_418M](https://huggingface.co/facebook/m2m100_418M) and [m2m100_1.2B](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://www.jmlr.org/papers/volume22/20-1307/)
-- [Prism](https://github.com/thompsonb/prism) by [Thompson and Post (2020)](https://aclanthology.org/2020.emnlp-main.8/)
+This library currently supports four NMT models:
+- [`small100`](https://huggingface.co/alirezamsh/small100) by [Mohammadshahi et al. (2022)](https://arxiv.org/abs/2210.11621)
+- [`m2m100_418M`](https://huggingface.co/facebook/m2m100_418M) and [`m2m100_1.2B`](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://www.jmlr.org/papers/volume22/20-1307/)
+- [`prism`](https://github.com/thompsonb/prism) by [Thompson and Post (2020)](https://aclanthology.org/2020.emnlp-main.8/)
 
-By default, the leanest model (m2m100_418M) is loaded. The main results in the paper are based on the Prism model, which has some extra requirements (see "Installation"), but is recommended due to its higher accuracy.
+By default, the leanest model (`small100`) is loaded. The main results in the paper are based on the Prism model, which has some extra dependencies (see "Installation" above).
 
 ```python
-scorer = NMTScorer("m2m100_418M", device=None)  # default
-scorer = NMTScorer("m2m100_1.2B", device=None)
-scorer = NMTScorer("prism", device=None)
+scorer = NMTScorer("small100", device=None)  # default
+scorer = NMTScorer("small100", device="cuda:0")  # Enable faster inference on GPU
+scorer = NMTScorer("m2m100_418M", device="cuda:0")
+scorer = NMTScorer("m2m100_1.2B", device="cuda:0")
+scorer = NMTScorer("prism", device="cuda:0")
 ```
+
+**Which model should I choose?**
+
+The page (/experiments/results/summary.md) compares the models regarding their accuracy and latency.
+- Generally, we recommend Prism because it tends to have the highest accuracy. Also, Prism's implementation currently translates up 10x faster on GPU than the other models do, so we highly recommend to use Prism for the measures that require translation (`score_pivot()` and `score_cross_likelihood()`).
+- `small100` is 3.4x faster for `score_direct()` and has 94–98% of Prism's accuracy.
 
 #### Enable caching of NMT output
 It can make sense to cache the translations and scores if they are needed repeatedly, e.g. in reference-based evaluation.
-
 
 ```python
 scorer.score_direct(
@@ -148,3 +156,11 @@ See [experiments/README.md](experiments/README.md)
 ## License
 - Code: MIT License
 - Data: See data subdirectories
+
+## Changelog
+- v0.3.0
+  - Implement the distilled [`small100`](https://huggingface.co/alirezamsh/small100) model by [Mohammadshahi et al. (2022)](https://arxiv.org/abs/2210.11621) and use this model by default.
+  - Enable half-precision inference for `m2m100` models and `small100` by default; see (/experiments/results/summary.md) for benchmark results
+
+- v0.2.0
+  - Bugfix: Provide source language to `m2m100` models (#2). The fix is backwards-compatible but a warning is now raised if `m2m100` is used without specifying the input language.

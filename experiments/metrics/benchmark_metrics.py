@@ -259,6 +259,49 @@ def get_paraphrase_metrics_m2m100(device=None) -> List[BenchmarkMetric]:
     ]
 
 
+def get_paraphrase_metrics_small100(device=None) -> List[BenchmarkMetric]:
+    from nmtscore import NMTScorer
+    from experiments.metrics.nmtscore_metrics import DirectNMTScoreMetric, PivotNMTScoreMetric, CrossLikelihoodNMTScoreMetric
+    batch_size = 4
+    return [
+        BenchmarkMetric(
+            title="Direct_Translation_Probability (small100)",
+            metric_names=["nmtscore-direct"],
+            load_func=lambda a_lang, b_lang, device=device: DirectNMTScoreMetric(
+                a_lang,
+                b_lang,
+                scorer=NMTScorer("small100", device=device),
+                both_directions=True,
+                score_kwargs={**NMT_SCORE_KWARGS, **{"batch_size": batch_size}},
+            ),
+        ),
+        BenchmarkMetric(
+            title="Pivot_Translation_Probability (small100)",
+            metric_names=["nmtscore-pivot"],
+            load_func=lambda a_lang, b_lang, device=device: PivotNMTScoreMetric(
+                a_lang,
+                b_lang,
+                scorer=NMTScorer("small100", device=device),
+                both_directions=True,
+                translate_kwargs={**NMT_TRANSLATE_KWARGS, **{"batch_size": batch_size}},
+                score_kwargs={**NMT_SCORE_KWARGS, **{"batch_size": batch_size}},
+            ),
+        ),
+        BenchmarkMetric(
+            title="Translation_Cross-Likelihood (small100)",
+            metric_names=["nmtscore-cross"],
+            load_func=lambda a_lang, b_lang, device=device: CrossLikelihoodNMTScoreMetric(
+                a_lang,
+                b_lang,
+                scorer=NMTScorer("small100", device=device),
+                both_directions=True,
+                translate_kwargs={**NMT_TRANSLATE_KWARGS, **{"batch_size": batch_size}},
+                score_kwargs={**NMT_SCORE_KWARGS, **{"batch_size": batch_size}},
+            ),
+        ),
+    ]
+
+
 def get_normalization_ablation_metrics(device=None) -> List[BenchmarkMetric]:
     from nmtscore import NMTScorer
     from experiments.metrics.nmtscore_metrics import DirectNMTScoreMetric, PivotNMTScoreMetric, CrossLikelihoodNMTScoreMetric

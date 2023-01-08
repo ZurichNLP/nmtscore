@@ -217,6 +217,9 @@ def load_translation_model(name: str, **kwargs) -> TranslationModel:
     elif name == "m2m100_1.2B":
         from nmtscore.models.m2m100 import M2M100Model
         translation_model = M2M100Model(model_name_or_path="facebook/m2m100_1.2B", **kwargs)
+    elif name == "small100":
+        from nmtscore.models.small100 import SMALL100Model
+        translation_model = SMALL100Model(**kwargs)
     elif name == "prism":
         try:
             import fairseq
