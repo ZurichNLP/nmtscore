@@ -4,7 +4,7 @@
 
 A library of translation-based text similarity measures.
 
-To learn more about how these measures work, have a look at [Jannis' blog post](https://vamvas.ch/nmtscore-text-similarity-via-translation). Also, read our paper, ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://arxiv.org/abs/2204.13692) (Findings of EMNLP).
+To learn more about how these measures work, have a look at [Jannis' blog post](https://vamvas.ch/nmtscore-text-similarity-via-translation). Also, read our paper, ["NMTScore: A Multilingual Analysis of Translation-based Text Similarity Measures"](https://aclanthology.org/2022.findings-emnlp.15/) (Findings of EMNLP).
 
 <img src="img/figure1.png" alt="Three text similarity measures implemented in this library" width="500">
 
@@ -75,7 +75,7 @@ scorer.score_cross_likelihood(
 
 #### Different NMT models
 This library currently supports four NMT models:
-- [`small100`](https://huggingface.co/alirezamsh/small100) by [Mohammadshahi et al. (2022)](https://arxiv.org/abs/2210.11621)
+- [`small100`](https://huggingface.co/alirezamsh/small100) by [Mohammadshahi et al. (2022)](https://aclanthology.org/2022.emnlp-main.571/)
 - [`m2m100_418M`](https://huggingface.co/facebook/m2m100_418M) and [`m2m100_1.2B`](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://www.jmlr.org/papers/volume22/20-1307/)
 - [`prism`](https://github.com/thompsonb/prism) by [Thompson and Post (2020)](https://aclanthology.org/2020.emnlp-main.8/)
 
@@ -141,15 +141,16 @@ See [experiments/README.md](experiments/README.md)
 ## Citation
 ```bibtex
 @inproceedings{vamvas-sennrich-2022-nmtscore,
-       author = "Vamvas, Jannis and
-                 Sennrich, Rico",
-        title = "{NMTScore}: A Multilingual Analysis of Translation-based Text Similarity Measures",
+    title = "{NMTS}core: A Multilingual Analysis of Translation-based Text Similarity Measures",
+    author = "Vamvas, Jannis  and
+      Sennrich, Rico",
     booktitle = "Findings of the Association for Computational Linguistics: EMNLP 2022",
-         year = "2022",
-        month = dec,
-      address = "Abu Dhabi, United Arab Emirates",
+    month = dec,
+    year = "2022",
+    address = "Abu Dhabi, United Arab Emirates",
     publisher = "Association for Computational Linguistics",
-       eprint = {2204.13692}
+    url = "https://aclanthology.org/2022.findings-emnlp.15",
+    pages = "198--213"
 }
 ```
 
@@ -159,7 +160,7 @@ See [experiments/README.md](experiments/README.md)
 
 ## Changelog
 - v0.3.0
-  - Implement the distilled [`small100`](https://huggingface.co/alirezamsh/small100) model by [Mohammadshahi et al. (2022)](https://arxiv.org/abs/2210.11621) and use this model by default.
+  - Implement the distilled [`small100`](https://huggingface.co/alirezamsh/small100) model by [Mohammadshahi et al. (2022)](https://aclanthology.org/2022.emnlp-main.571/) and use this model by default.
   - Enable half-precision inference for `m2m100` models and `small100` by default; see (/experiments/results/summary.md) for benchmark results
 
 - v0.2.0
