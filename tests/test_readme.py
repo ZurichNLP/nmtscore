@@ -24,7 +24,7 @@ class ReadmeTestCase(TestCase):
     def test_nmtscorer(self):
         scorer = NMTScorer()
         score = scorer.score("This is a sentence.", "This is another sentence.")
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
 
     def test_batch_processing(self):
         scorer = NMTScorer()
@@ -33,20 +33,20 @@ class ReadmeTestCase(TestCase):
             ["This is another sentence.", "This sentence is completely unrelated.", "This is another sentence."],
         )
         self.assertEqual(3, len(scores))
-        self.assertAlmostEqual(0.4519273529250307, scores[0], places=4)
-        self.assertAlmostEqual(0.13127038689469997, scores[1], places=4)
-        self.assertAlmostEqual(1.0000000000000102, scores[2], places=4)
+        self.assertAlmostEqual(0.45572545262642583, scores[0], places=4)
+        self.assertAlmostEqual(0.13128832336168145, scores[1], places=4)
+        self.assertAlmostEqual(0.99999993180868, scores[2], places=4)
 
     def test_different_similarity_measures(self):
         scorer = NMTScorer()
         a = "This is a sentence."
         b = "This is another sentence."
         score = scorer.score_cross_likelihood(a, b, tgt_lang="en", normalize=True, both_directions=True)
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
         score = scorer.score_direct(a, b, a_lang="en", b_lang="en", normalize=True, both_directions=True)
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
         score = scorer.score_pivot(a, b, a_lang="en", b_lang="en", pivot_lang="en", normalize=True, both_directions=True)
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
 
     @unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
     def test_different_nmt_models(self):
@@ -59,18 +59,18 @@ class ReadmeTestCase(TestCase):
         a = "This is a sentence."
         b = "This is another sentence."
         score = scorer.score_cross_likelihood(a, b, translate_kwargs={"batch_size": 16}, score_kwargs={"batch_size": 16})
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
         score = scorer.score_direct(a, b, a_lang="en", b_lang="en", score_kwargs={"batch_size": 16})
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
 
     def test_caching(self):
         scorer = NMTScorer()
         a = "This is a sentence."
         b = "This is another sentence."
         score = scorer.score_cross_likelihood(a, b, translate_kwargs={"use_cache": True}, score_kwargs={"use_cache": True})
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
         score = scorer.score_direct(a, b, a_lang="en", b_lang="en", score_kwargs={"use_cache": True})
-        self.assertAlmostEqual(0.45192727655379844, score, places=4)
+        self.assertAlmostEqual(0.45572562294591235, score, places=4)
 
     @mock.patch('sys.stdout', new_callable=io.StringIO)
     def test_version_signature(self, mock_stdout):
@@ -78,11 +78,11 @@ class ReadmeTestCase(TestCase):
         a = "This is a sentence."
         b = "This is another sentence."
         score = scorer.score(a, b, print_signature=True)
-        self.assertIn("NMTScore-cross|tgt-lang:en|a-lang:en|b-lang:en|model:facebook/m2m100_418M|normalized|both-directions", mock_stdout.getvalue())
+        self.assertIn("NMTScore-cross|tgt-lang:en|model:alirezamsh/small100|normalized|both-directions", mock_stdout.getvalue())
 
     def test_nmt_models(self):
-        model = load_translation_model("m2m100_418M")
+        model = load_translation_model("small100")
         translations = model.translate("de", ["This is a test."], src_lang="en")
         self.assertEqual(["Das ist ein Test."], translations)
         scores = model.score("de", ["This is a test."], ["Das ist ein Test."], src_lang="en")
-        self.assertAlmostEqual(0.5148844122886658, scores[0], places=4)
+        self.assertAlmostEqual(0.8286197781562805, scores[0], places=4)

@@ -10,7 +10,7 @@ from nmtscore.models import TranslationModel, load_translation_model
 class NMTScorer:
 
     def __init__(self,
-                 model: Union[TranslationModel, str] = "m2m100_418M",
+                 model: Union[TranslationModel, str] = "small100",
                  device=None,
                  model_kwargs: dict = None,
                  ):

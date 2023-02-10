@@ -25,7 +25,7 @@ from nmtscore import NMTScorer
 scorer = NMTScorer()
 
 scorer.score("This is a sentence.", "This is another sentence.")
-# 0.45192727655379844
+# 0.45572562294591235
 ```
 
 #### Different similarity measures
@@ -52,7 +52,7 @@ scorer.score(
     ["This is a sentence.", "This is a sentence.", "This is another sentence."],
     ["This is another sentence.", "This sentence is completely unrelated.", "This is another sentence."],
 )
-# [0.4519273529250307, 0.13127038689469997, 1.0000000000000102]
+# [0.45572545262642583, 0.13128832336168145, 0.99999993180868]
 ```
 
 The sentences in the first list are compared element-wise to the sentences in the second list.
@@ -91,7 +91,7 @@ scorer = NMTScorer("prism", device="cuda:0")
 
 **Which model should I choose?**
 
-The page (/experiments/results/summary.md) compares the models regarding their accuracy and latency.
+The page [experiments/results/summary.md](experiments/results/summary.md) compares the models regarding their accuracy and latency.
 - Generally, we recommend Prism because it tends to have the highest accuracy. Also, Prism's implementation currently translates up 10x faster on GPU than the other models do, so we highly recommend to use Prism for the measures that require translation (`score_pivot()` and `score_cross_likelihood()`).
 - `small100` is 3.4x faster for `score_direct()` and has 94–98% of Prism's accuracy.
 
@@ -116,7 +116,7 @@ Activating this option will create an SQLite database in the ~/.cache directory.
 #### Print a version signature (à la [SacreBLEU](https://github.com/mjpost/sacrebleu))
 ```python
 scorer.score(a, b, print_signature=True)
-# NMTScore-cross|tgt-lang:en|model:facebook/m2m100_418M|normalized|both-directions|v0.1.0|hf4.17.0
+# NMTScore-cross|tgt-lang:en|model:alirezamsh/small100|normalized|both-directions|v0.3.0|hf4.26.1
 ```
 
 ### Direct usage of NMT models
@@ -126,13 +126,13 @@ The NMT models also provide a direct interface for translating and scoring.
 ```python
 from nmtscore.models import load_translation_model
 
-model = load_translation_model("prism")
+model = load_translation_model("small100")
 
 model.translate("de", ["This is a test."])
 # ["Das ist ein Test."]
 
 model.score("de", ["This is a test."], ["Das ist ein Test."])
-# [0.5148844122886658]
+# [0.8286197781562805]
 ```
 
 ## Experiments
@@ -159,7 +159,7 @@ See [experiments/README.md](experiments/README.md)
 - Data: See data subdirectories
 
 ## Changelog
-- v0.3.0
+- v0.3.1
   - Implement the distilled [`small100`](https://huggingface.co/alirezamsh/small100) model by [Mohammadshahi et al. (2022)](https://aclanthology.org/2022.emnlp-main.571/) and use this model by default.
   - Enable half-precision inference for `m2m100` models and `small100` by default; see (/experiments/results/summary.md) for benchmark results
 
