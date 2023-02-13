@@ -76,7 +76,7 @@ scorer.score_cross_likelihood(
 #### Different NMT models
 This library currently supports four NMT models:
 - [`small100`](https://huggingface.co/alirezamsh/small100) by [Mohammadshahi et al. (2022)](https://aclanthology.org/2022.emnlp-main.571/)
-- [`m2m100_418M`](https://huggingface.co/facebook/m2m100_418M) and [`m2m100_1.2B`](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://www.jmlr.org/papers/volume22/20-1307/)
+- [`m2m100_418M`](https://huggingface.co/facebook/m2m100_418M) and [`m2m100_1.2B`](https://huggingface.co/facebook/m2m100_1.2B) by [Fan et al. (2021)](https://jmlr.org/papers/v22/20-1307.html)
 - [`prism`](https://github.com/thompsonb/prism) by [Thompson and Post (2020)](https://aclanthology.org/2020.emnlp-main.8/)
 
 By default, the leanest model (`small100`) is loaded. The main results in the paper are based on the Prism model, which has some extra dependencies (see "Installation" above).
