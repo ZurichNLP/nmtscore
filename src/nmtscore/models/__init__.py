@@ -140,6 +140,9 @@ class TranslationModel:
 
         self._set_tgt_lang(tgt_lang)
         if self.requires_src_lang:
+            if src_lang is None:
+                warnings.warn(f"NMT model {self} requires the src language. Assuming 'en'; override with `src_lang`")
+                src_lang = "en"
             self._set_src_lang(src_lang)
         if not source_sentences_list:
             scores_list = []
