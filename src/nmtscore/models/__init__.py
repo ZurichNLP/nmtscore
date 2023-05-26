@@ -60,7 +60,10 @@ class TranslationModel:
                 warnings.warn(f"NMT model {self} requires the src language. Assuming 'en'; override with `src_lang`")
                 src_lang = "en"
             self._set_src_lang(src_lang)
-        translations_list = self._translate(source_sentences_list, return_score, batch_size, **kwargs)
+        if not source_sentences_list:
+            translations_list = []
+        else:
+            translations_list = self._translate(source_sentences_list, return_score, batch_size, **kwargs)
         assert len(translations_list) == len(source_sentences_list)
 
         if use_cache:
@@ -138,7 +141,10 @@ class TranslationModel:
         self._set_tgt_lang(tgt_lang)
         if self.requires_src_lang:
             self._set_src_lang(src_lang)
-        scores_list = self._score(source_sentences_list, hypothesis_sentences_list, batch_size, **kwargs)
+        if not source_sentences_list:
+            scores_list = []
+        else:
+            scores_list = self._score(source_sentences_list, hypothesis_sentences_list, batch_size, **kwargs)
         assert len(scores_list) == len(source_sentences_list)
 
         if use_cache:
