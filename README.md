@@ -25,7 +25,7 @@ from nmtscore import NMTScorer
 scorer = NMTScorer()
 
 scorer.score("This is a sentence.", "This is another sentence.")
-# 0.45572562294591235
+# 0.5025776988808766
 ```
 
 #### Different similarity measures
@@ -52,7 +52,7 @@ scorer.score(
     ["This is a sentence.", "This is a sentence.", "This is another sentence."],
     ["This is another sentence.", "This sentence is completely unrelated.", "This is another sentence."],
 )
-# [0.45572545262642583, 0.13128832336168145, 0.99999993180868]
+# [0.5025777998113548, 0.1640727324003354, 1.0000000000000049]
 ```
 
 The sentences in the first list are compared element-wise to the sentences in the second list.
@@ -132,7 +132,7 @@ model.translate("de", ["This is a test."])
 # ["Das ist ein Test."]
 
 model.score("de", ["This is a test."], ["Das ist ein Test."])
-# [0.8286197781562805]
+# [0.7708902359008789]
 ```
 
 ## Experiments

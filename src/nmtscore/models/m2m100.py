@@ -7,6 +7,7 @@ from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer, Transl
 from transformers.file_utils import PaddingStrategy
 from transformers.models.m2m_100.modeling_m2m_100 import shift_tokens_right
 
+from nmtscore.models.tokenization_small100 import SMALL100Tokenizer
 from nmtscore.models import TranslationModel
 from nmtscore.models.utils import batch
 
@@ -106,10 +107,14 @@ class M2M100Model(TranslationModel):
             inputs["decoder_input_ids"] = shift_tokens_right(inputs["labels"], self.tokenizer.pad_token_id, self.model.config.decoder_start_token_id)
             output = self.model(**inputs)
             batch_scores = torch.zeros(len(src_sentences), device=self.model.device)
+            if isinstance(self.tokenizer, SMALL100Tokenizer):
+                offset = 0  # No language token in tgt
+            else:
+                offset = 1
             for i in range(len(src_sentences)):
                 loss = torch.nn.CrossEntropyLoss()(
-                    output.logits[i][1:].view(-1, self.model.config.vocab_size),
-                    inputs["labels"][i][1:].view(-1),
+                    output.logits[i][offset:].view(-1, self.model.config.vocab_size),
+                    inputs["labels"][i][offset:].view(-1),
                 )
                 batch_scores[i] = 2 ** (-loss)
             scores += batch_scores.tolist()
