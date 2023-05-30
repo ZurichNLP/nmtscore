@@ -159,6 +159,10 @@ See [experiments/README.md](experiments/README.md)
 - Data: See data subdirectories
 
 ## Changelog
+- v0.3.2
+  - Fix score calculation with `small100` model (account for the fact that the target sequence is not prefixed with the target language, as is the case for `m2m100`).
+  - Improve caching efficiency
+
 - v0.3.1
   - Implement the distilled [`small100`](https://huggingface.co/alirezamsh/small100) model by [Mohammadshahi et al. (2022)](https://aclanthology.org/2022.emnlp-main.571/) and use this model by default.
   - Enable half-precision inference for `m2m100` models and `small100` by default; see (/experiments/results/summary.md) for benchmark results
