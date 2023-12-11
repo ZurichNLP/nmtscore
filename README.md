@@ -10,7 +10,7 @@ To learn more about how these measures work, have a look at [Jannis' blog post](
 
 ## Installation
 
-- Requires Python >= 3.7 and PyTorch
+- Requires Python >= 3.8 and PyTorch
 - `pip install nmtscore`
 - Extra requirements for the Prism model: `pip install nmtscore[prism]`
 
