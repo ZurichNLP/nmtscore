@@ -161,8 +161,8 @@ See [experiments/README.md](experiments/README.md)
 
 ## Changelog
 
-- v0.3.4
-  - Include NLLB models ([Costa-jussà et al., 2022](https://arxiv.org/abs/2207.04672)): [`nllb-200-1.3B`](https://huggingface.co/facebook/nllb-200-1.3B), [`nllb-200-3.3B`](https://huggingface.co/facebook/nllb-200-3.3B), [`nllb-200-distilled-600M`](https://huggingface.co/nllb-200-distilled-600M), [`nllb-200-distilled-1.3B`](https://huggingface.co/nllb-200-distilled-1.3B)`. Note that the models use [BCP-47 language codes](https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200).
+- v0.3.4 (to be released)
+  - Include NLLB models ([Costa-jussà et al., 2022](https://arxiv.org/abs/2207.04672)): [`nllb-200-1.3B`](https://huggingface.co/facebook/nllb-200-1.3B), [`nllb-200-3.3B`](https://huggingface.co/facebook/nllb-200-3.3B), [`nllb-200-distilled-600M`](https://huggingface.co/facebook/nllb-200-distilled-600M), [`nllb-200-distilled-1.3B`](https://huggingface.co/facebook/nllb-200-distilled-1.3B). Note that the models use [BCP-47 language codes](https://github.com/facebookresearch/flores/blob/main/flores200/README.md#languages-in-flores-200).
 
 - v0.3.3
   - Update minimum required Python version to 3.8
