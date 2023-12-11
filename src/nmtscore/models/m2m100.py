@@ -3,7 +3,7 @@ from typing import List, Union, Tuple
 
 import torch
 from tqdm import tqdm
-from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer, TranslationPipeline
+from transformers import M2M100ForConditionalGeneration, AutoTokenizer, TranslationPipeline
 from transformers.file_utils import PaddingStrategy
 from transformers.models.m2m_100.modeling_m2m_100 import shift_tokens_right
 
@@ -40,7 +40,7 @@ class M2M100Model(TranslationModel):
         return self.model_name_or_path
 
     def _load_tokenizer(self):
-        return M2M100Tokenizer.from_pretrained(self.model_name_or_path)
+        return AutoTokenizer.from_pretrained(self.model_name_or_path)
 
     def _load_model(self):
         return M2M100ForConditionalGeneration.from_pretrained(self.model_name_or_path)
@@ -50,12 +50,20 @@ class M2M100Model(TranslationModel):
         return True
 
     def _set_src_lang(self, src_lang: str):
+        self._validate_lang_code(src_lang)
         self.src_lang = src_lang
         self.tokenizer.src_lang = src_lang
 
     def _set_tgt_lang(self, tgt_lang: str):
+        self._validate_lang_code(tgt_lang)
         self.tgt_lang = tgt_lang
         self.tokenizer.tgt_lang = tgt_lang
+
+    def _validate_lang_code(self, lang_code: str):
+        from transformers.models.m2m_100.tokenization_m2m_100 import FAIRSEQ_LANGUAGE_CODES
+        if lang_code not in FAIRSEQ_LANGUAGE_CODES["m2m100"]:
+            raise ValueError(f"{lang_code} is not a valid language code for {self}. "
+                             f"Valid language codes are: {FAIRSEQ_LANGUAGE_CODES['m2m100']}")
 
     @torch.no_grad()
     def _translate(self,
