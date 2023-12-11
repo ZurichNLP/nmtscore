@@ -159,6 +159,12 @@ See [experiments/README.md](experiments/README.md)
 - Data: See data subdirectories
 
 ## Changelog
+
+- v0.3.3
+  - Update minimum required Python version to 3.8
+  - Require transformers<4.34 to ensure compatibility for `small100` model
+  - `m2m100`/`small100`: Stop adding extra EOS tokens when scoring, which is not needed anymore
+
 - v0.3.2
   - Fix score calculation with `small100` model (account for the fact that the target sequence is not prefixed with the target language, as is the case for `m2m100`).
   - Improve caching efficiency
