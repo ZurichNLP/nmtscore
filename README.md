@@ -10,7 +10,7 @@ To learn more about how these measures work, have a look at [Jannis' blog post](
 
 ## Installation
 
-- Requires Python >= 3.7 and PyTorch
+- Requires Python >= 3.8 and PyTorch
 - `pip install nmtscore`
 - Extra requirements for the Prism model: `pip install nmtscore[prism]`
 
@@ -25,7 +25,7 @@ from nmtscore import NMTScorer
 scorer = NMTScorer()
 
 scorer.score("This is a sentence.", "This is another sentence.")
-# 0.5025776988808766
+# 0.4677300455046415
 ```
 
 #### Different similarity measures
@@ -52,7 +52,7 @@ scorer.score(
     ["This is a sentence.", "This is a sentence.", "This is another sentence."],
     ["This is another sentence.", "This sentence is completely unrelated.", "This is another sentence."],
 )
-# [0.5025777998113548, 0.1640727324003354, 1.0000000000000049]
+# [0.46772973967003206, 0.15306852595255185, 1.0]
 ```
 
 The sentences in the first list are compared element-wise to the sentences in the second list.
@@ -132,7 +132,7 @@ model.translate("de", ["This is a test."])
 # ["Das ist ein Test."]
 
 model.score("de", ["This is a test."], ["Das ist ein Test."])
-# [0.7708902359008789]
+# [0.8293135166168213]
 ```
 
 ## Experiments
