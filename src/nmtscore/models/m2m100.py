@@ -94,8 +94,6 @@ class M2M100Model(TranslationModel):
             batch(hypothesis_sentences, batch_size),
         )
         for src_sentences, tgt_sentences in batch_iterator:
-            # Hack: Append a second EOS token to make sure that one EOS is still there after shift_tokens_right
-            tgt_sentences = [f"{sentence} {self.tokenizer.eos_token}" for sentence in tgt_sentences]
             inputs = self.tokenizer(
                 src_sentences,
                 text_target=tgt_sentences,
