@@ -3,7 +3,7 @@ from typing import List, Union, Tuple
 
 import torch
 from tqdm import tqdm
-from transformers import M2M100ForConditionalGeneration, M2M100Tokenizer, TranslationPipeline
+from transformers import M2M100ForConditionalGeneration, AutoTokenizer, TranslationPipeline
 from transformers.file_utils import PaddingStrategy
 from transformers.models.m2m_100.modeling_m2m_100 import shift_tokens_right
 
@@ -40,7 +40,7 @@ class M2M100Model(TranslationModel):
         return self.model_name_or_path
 
     def _load_tokenizer(self):
-        return M2M100Tokenizer.from_pretrained(self.model_name_or_path)
+        return AutoTokenizer.from_pretrained(self.model_name_or_path)
 
     def _load_model(self):
         return M2M100ForConditionalGeneration.from_pretrained(self.model_name_or_path)

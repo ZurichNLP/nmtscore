@@ -145,5 +145,21 @@ class PrismTestCase(NMTModelTestCase):
         cls.model = load_translation_model("prism")
 
 
+@unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
+class SmallDistilledNLLB200TestCase(NMTModelTestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.model = load_translation_model("nllb-200-distilled-600M")
+
+
+@unittest.skipIf(os.getenv("SKIP_SLOW_TESTS", False), "Slow")
+class SmallNLLB200TestCase(NMTModelTestCase):
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.model = load_translation_model("nllb-200-1.3B")
+
+
 # https://stackoverflow.com/a/43353680/3902795
 del NMTModelTestCase

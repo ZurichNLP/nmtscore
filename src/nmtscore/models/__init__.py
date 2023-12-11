@@ -237,6 +237,18 @@ def load_translation_model(name: str, **kwargs) -> TranslationModel:
                                               "`pip install nmtscore[prism]`")
         from nmtscore.models.prism import PrismModel
         translation_model = PrismModel(**kwargs)
+    elif name == "nllb-200-1.3B":
+        from nmtscore.models.m2m100 import M2M100Model
+        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-1.3B", **kwargs)
+    elif name == "nllb-200-3.3B":
+        from nmtscore.models.m2m100 import M2M100Model
+        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-3.3B", **kwargs)
+    elif name == "nllb-200-distilled-600M":
+        from nmtscore.models.m2m100 import M2M100Model
+        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-distilled-600M", **kwargs)
+    elif name == "nllb-200-distilled-1.3B":
+        from nmtscore.models.m2m100 import M2M100Model
+        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-distilled-1.3B", **kwargs)
     else:
         raise NotImplementedError
     return translation_model
