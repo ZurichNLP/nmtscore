@@ -183,6 +183,9 @@ class TranslationModel:
     def _set_tgt_lang(self, tgt_lang: str):
         raise NotImplementedError
 
+    def _validate_lang_code(self, lang_code: str):
+        pass
+
     def _translate(self,
                    source_sentences: List[str],
                    return_score: bool = False,
@@ -238,17 +241,17 @@ def load_translation_model(name: str, **kwargs) -> TranslationModel:
         from nmtscore.models.prism import PrismModel
         translation_model = PrismModel(**kwargs)
     elif name == "nllb-200-1.3B":
-        from nmtscore.models.m2m100 import M2M100Model
-        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-1.3B", **kwargs)
+        from nmtscore.models.nllb import NLLBModel
+        translation_model = NLLBModel(model_name_or_path="facebook/nllb-200-1.3B", **kwargs)
     elif name == "nllb-200-3.3B":
-        from nmtscore.models.m2m100 import M2M100Model
-        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-3.3B", **kwargs)
+        from nmtscore.models.nllb import NLLBModel
+        translation_model = NLLBModel(model_name_or_path="facebook/nllb-200-3.3B", **kwargs)
     elif name == "nllb-200-distilled-600M":
-        from nmtscore.models.m2m100 import M2M100Model
-        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-distilled-600M", **kwargs)
+        from nmtscore.models.nllb import NLLBModel
+        translation_model = NLLBModel(model_name_or_path="facebook/nllb-200-distilled-600M", **kwargs)
     elif name == "nllb-200-distilled-1.3B":
-        from nmtscore.models.m2m100 import M2M100Model
-        translation_model = M2M100Model(model_name_or_path="facebook/nllb-200-distilled-1.3B", **kwargs)
+        from nmtscore.models.nllb import NLLBModel
+        translation_model = NLLBModel(model_name_or_path="facebook/nllb-200-distilled-1.3B", **kwargs)
     else:
         raise NotImplementedError
     return translation_model
